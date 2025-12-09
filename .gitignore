@@ -1,2 +1,4 @@
 /modelli_fine-tuned
 /__pycache__
+
+.keras

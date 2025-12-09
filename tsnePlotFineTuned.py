@@ -5,61 +5,59 @@ import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import load_img, img_to_array
-from keras.applications.convnext import preprocess_input as convnext_pre
 
-from estraiLayer import estraiLayerStile 
+from keras.applications.inception_resnet_v2 import InceptionResNetV2, preprocess_input as inception_pre
+from keras.applications.resnet50 import ResNet50, preprocess_input as resnet_pre
+from keras.applications.efficientnet_v2 import EfficientNetV2M, preprocess_input as effnet_pre
+from keras.applications.convnext import ConvNeXtBase, preprocess_input as convnext_pre
+
+from estraiLayer import estraiLayerStile, estraiUltimoLayer 
 from indicizzaDataset import indicizza_dataset_completo
 
-percorso_modello = "C:\\Users\\Flavio\\Desktop\\modelli_fine-tuned\\convnext_finetuned_alphonse-mucha.keras"
+mappa_funzioni = {
+    "inceptionresnetv2": inception_pre,
+    "resnet50": resnet_pre,
+    "efficientnetv2m": effnet_pre,
+    "convnextbase": convnext_pre
+}
+
+percorso_modello = "C:\\Users\\Flavio\\Desktop\\modelli_fine-tuned\\convnext_finetuned.keras"
 input_size = (224, 224)
 percorso_dataset = "C:\\Users\\Flavio\\Desktop\\datasetTotale"
 
-artista_target = "wikiart_alphonse-mucha"
-PROTEZIONE_TARGET = "mist"
+artisti = [
+    "wikiart_albrecht-durer",
+    "wikiart_alphonse-mucha",
+    "wikiart_anna-ostroumova-lebedeva",
+    "wikiart_edvard-munch",
+    "wikiart_edward-hopper",
+    ]
 
 #Caricamento dataset
 df = indicizza_dataset_completo(percorso_dataset)
 
 if df.empty:
-    print("ERRORE: Il dataset indicizzato è vuoto.")
+    print("dataset vuoto.")
     exit()
 
 #Filtro immagini originali
-df_orig = df[
-    (df["artista"] == artista_target) & 
+df_plot = df[
     (df["categoria"] == "Training") &
     (df["tipo"] == "Original")
 ].copy()
-df_orig["Label_Plot"] = "Immagini Originali"
-
-#filtro immagini generate partendo da immagini protette
-df_protected = df[
-    (df["artista"] == artista_target) & 
-    (df["categoria"] == "Generated") & 
-    (df["protezione"] == PROTEZIONE_TARGET)
-].copy()
-df_protected["Label_Plot"] = f"Generate da {PROTEZIONE_TARGET}"
-
-#unione del dataset
-df_plot = pd.concat([df_orig, df_protected], ignore_index=True)
-
-print(f"\n--- ANALISI PER: {PROTEZIONE_TARGET} ---")
-print(df_plot["Label_Plot"].value_counts())
-
-if df_plot.empty:
-    print("Nessun dato trovato con i filtri correnti. Controlla 'artista_target' o i percorsi.")
-    exit()
 
 #Carico il modello fine-tuned
 try:
     modello_base = load_model(percorso_modello)
-    layer_stile = estraiLayerStile(modello_base)
+    #modello_base = ConvNeXtBase(weights="imagenet", include_top=False, input_shape=(224, 224, 3))
+    #layer_stile = estraiLayerStile(modello_base)
+    layer_stile = estraiUltimoLayer(modello_base)
     print("Modello caricato correttamente.")
 except Exception as e:
     print(f"Errore modello: {e}")
     exit()
 
-#Inizio ad estrarre le feature
+#Estrazione feature
 feature_list = []
 labels_list = []
 
@@ -73,7 +71,7 @@ for i, row in df_plot.iterrows():
         
         pred = layer_stile.predict(x).flatten()
         feature_list.append(pred)
-        labels_list.append(row["Label_Plot"])
+        labels_list.append(row["artista"])
     except Exception as e:
         print(f"\nErrore su {row['filename']}: {e}")
 
@@ -85,10 +83,8 @@ if len(feature_list) == 0:
 X = np.array(feature_list)
 
 print(f"\nCalcolo t-SNE su {len(X)} punti...")
-# Perplexity basata sul numero di immagini nel dataset
-perplex = min(30, len(X) - 1)
 
-tsne = TSNE(n_components=2, random_state=42, perplexity=perplex)
+tsne = TSNE(n_components=2, random_state=42, perplexity=10)
 
 Y = tsne.fit_transform(X)
 
@@ -97,11 +93,14 @@ plt.figure(figsize=(12, 8))
 
 # Mappa colori
 palette = {
-    "Immagini Originali": "blue",
-    f"Generate da {PROTEZIONE_TARGET}": "red"
+    "wikiart_albrecht-durer": "red",
+    "wikiart_alphonse-mucha": "blue",
+    "wikiart_anna-ostroumova-lebedeva": "yellow",
+    "wikiart_edvard-munch": "cyan",
+    "wikiart_edward-hopper": "green",
 }
 
-gruppi = df_plot["Label_Plot"].unique()
+gruppi = df_plot["artista"].unique()
 
 for gruppo in gruppi:
     # Trova gli indici corrispondenti a questo gruppo
@@ -112,7 +111,7 @@ for gruppo in gruppi:
 
     plt.scatter( Y[indici, 0], Y[indici, 1], c=palette.get(gruppo, "gray"), label=gruppo )
 
-plt.title(f"Analisi Efficacia Protezione: {PROTEZIONE_TARGET}\nArtista: {artista_target}", fontsize=14, fontweight='bold')
+plt.title(f"T-SNE su modello fine tuning per massimizzare la distanza tra gli artisti", fontsize=14, fontweight='bold')
 plt.legend(fontsize=12)
 plt.tight_layout()
 plt.show()
