@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
-from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import load_img, img_to_array
+from keras.models import load_model
+from keras.utils import load_img, img_to_array
 
 from keras.applications.inception_resnet_v2 import InceptionResNetV2, preprocess_input as inception_pre
 from keras.applications.resnet50 import ResNet50, preprocess_input as resnet_pre
