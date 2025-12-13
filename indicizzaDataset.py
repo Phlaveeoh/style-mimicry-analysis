@@ -91,17 +91,25 @@ def indicizza_dataset_completo(percorso_base):
                     sotto_categoria = "Protected"
                     # Struttura: .../protected/PROTEZIONE/artista
                     protezione = parts[indice_artista - 1]
-                    metodo = "None (Solo Protezione)"
 
             # B. RAMO GENERATED IMAGES
             elif generate in path_up:
                 macro_categoria = "Generated"
-                sotto_categoria = "Mimicry"
+                sotto_categoria = "Robust-Mimicry"
                 
+                # --- NUOVO BLOCCO: NO-PROTECTIONS (Immagini "Clean") ---
+                # Percorso tipo: .../no-protections/mist/noisy_upscaling/wikiart_artista
+                if "no-protections" in path_up:
+                    sotto_categoria = "No-Protections"
+                    
+                    metodo = parts[indice_artista - 1] 
+                    # NOTA: Qui indica il GRUPPO DI CONTROLLO, non che l'immagine è protetta.
+                    protezione = parts[indice_artista - 2]
+                    
                 # Struttura: .../naive-mimicry/PROTEZIONE/artista
                 #Immagini generate senza metodi particolari da immagini protette
                 if "naive-mimicry" in path_up:
-                    metodo = "Naive-Mimicry"
+                    sotto_categoria = "Naive-Mimicry"
                     protezione = parts[indice_artista - 1]
                 else:
                     # Struttura Standard: .../PROTEZIONE/METODO/artista
@@ -135,3 +143,12 @@ def indicizza_dataset_completo(percorso_base):
     df = pd.DataFrame(data)
     print(f"Indicizzazione completata. Trovate {len(df)} immagini.")
     return df
+
+percorso = "C:\\Users\\Flavio\\Desktop\\datasetTotale" # Il tuo percorso
+df = indicizza_dataset_completo(percorso)
+
+# 2. Salva il CSV
+nome_file_csv = "dataset_immagini_completo.csv"
+df.to_csv(nome_file_csv, index=False)
+
+print(f"Dataset salvato correttamente in: {nome_file_csv}")

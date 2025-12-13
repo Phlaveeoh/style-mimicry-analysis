@@ -82,7 +82,6 @@ base.trainable = False
 
 x = base.output
 x = GlobalAveragePooling2D()(x)
-x = BatchNormalization()(x)
 x = Dropout(0.5)(x)
 out = Dense(5, activation="softmax")(x)
 
@@ -125,7 +124,7 @@ model.compile(
 early_stop_fine = EarlyStopping(
     monitor='val_loss', 
     patience=5,
-    min_delta=0.005,
+    min_delta=0.05,
     restore_best_weights=True
 )
 
