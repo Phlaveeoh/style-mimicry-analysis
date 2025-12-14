@@ -1,4 +1,21 @@
-/modelli_fine-tuned
-/__pycache__
+#Python
+__pycache__/
+*.py[cod]
+*$py.class
 
-.keras
+#IDE
+.vscode/
+.idea/
+.DS_Store
+
+#Modelli
+*.keras
+
+#grafici t-SNE
+/t-sne_plots/
+
+#File CSV generati
+*.csv
+
+#log
+*.log

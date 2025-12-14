@@ -1,4 +1,5 @@
 import os
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,6 +15,44 @@ from keras.applications.convnext import ConvNeXtBase, preprocess_input as convne
 from estraiLayer import estraiLayerStile, estraiUltimoLayer 
 from indicizzaDataset import indicizza_dataset_completo
 
+parser = argparse.ArgumentParser(
+    description="Crea un plot t-SNE confrontando le immagini originali con quelle generate tramite Naive Mimicry su immagini protette e non."
+)
+
+parser.add_argument(
+    "-m", "--modello",
+    type=str,
+    required=True,
+    metavar="percorso_modello",
+    help="Percorso del modello da utilizzare per l'estrazione delle feature."
+)
+
+parser.add_argument(
+    "-d", "--dataset",
+    type=str,
+    required=True,
+    metavar="percorso_dataset",
+    help="Percorso della cartella contenente il dataset."
+)
+
+parser.add_argument(
+    "-p", "--protezione",
+    type=str,
+    required=True,
+    metavar="protezione",
+    help="Tipo di protezione delle immagini generate (antidb, glaze, mist, none)."
+)
+
+parser.add_argument(
+    "-pp", "--preprocess",
+    type=str,
+    required=True,
+    metavar="preprocess",
+    help="Metodo di preprocessamento delle immagini generate (noisy_upscaling, impress++, diffpure, gaussian_noise_0.05, none)."
+)
+
+args = parser.parse_args()
+
 mappa_funzioni = {
     "inceptionresnetv2": inception_pre,
     "resnet50": resnet_pre,
@@ -22,12 +61,14 @@ mappa_funzioni = {
     "functional4": convnext_pre
 }
 
-percorso_modello = "C:\\Users\\Flavio\\Desktop\\modelli_fine-tuned\\convnext_finetuned.keras"
+#percorso_modello = "C:\\Users\\Flavio\\Desktop\\modelli_fine-tuned\\convnext_finetuned.keras"
+percorso_modello = args.modello
 input_size = (224, 224)
-percorso_dataset = "C:\\Users\\Flavio\\Desktop\\datasetTotale"
+#percorso_dataset = "C:\\Users\\Flavio\\Desktop\\datasetTotale"
+percorso_dataset = args.dataset
 
-protezione = "antidb"
-preprocess = "noisy_upscaling"
+protezione = args.protezione
+preprocess = args.preprocess
 
 artisti = [
     "wikiart_albrecht-durer",
@@ -35,7 +76,7 @@ artisti = [
     "wikiart_anna-ostroumova-lebedeva",
     "wikiart_edvard-munch",
     "wikiart_edward-hopper",
-    ]
+]
 
 #Caricamento dataset
 df = indicizza_dataset_completo(percorso_dataset)
@@ -131,7 +172,7 @@ tsne = TSNE(n_components=2, random_state=42, perplexity=p)
 Y = tsne.fit_transform(X)
 
 #plot del grafico
-plt.figure(figsize=(14, 10))
+plt.figure(figsize=(16, 9))
 
 palette = {
     # --- 1. Albrecht Durer (Famiglia dei ROSSI) ---
@@ -181,4 +222,11 @@ plt.legend(
     fontsize=12
 )
 plt.tight_layout()
-plt.show()
+
+nome_file = f"plot_{protezione}_{preprocess}.png"
+
+cartella_destinazione = "t-sne_plots/convnext_finetuned/originals_protected_unprotected/"
+os.makedirs(cartella_destinazione, exist_ok=True)
+percorso_completo = os.path.join(cartella_destinazione, nome_file)
+
+plt.savefig(percorso_completo, bbox_inches='tight', dpi=600) 
