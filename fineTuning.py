@@ -1,14 +1,14 @@
 import pandas as pd
 import tensorflow as tf
 from keras.applications.convnext import ConvNeXtBase, preprocess_input
-from keras.layers import Dense, GlobalAveragePooling2D, Dropout, BatchNormalization
+from keras.layers import Dense, GlobalAveragePooling2D, Dropout, MaxAveragePooling2D
 from keras.models import Model
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
 from keras.losses import CategoricalCrossentropy
-from indicizzaDataset import indicizza_dataset_completo
+from utils.indicizzaDataset import indicizza_dataset_completo
 
 percorsoDataset = "C:\\Users\\Flavio\\Desktop\\datasetTotale"
 df = indicizza_dataset_completo(percorsoDataset)
@@ -81,7 +81,7 @@ base = ConvNeXtBase(weights='imagenet', include_top=False, input_shape=(224, 224
 base.trainable = False
 
 x = base.output
-x = GlobalAveragePooling2D()(x)
+x = MaxAveragePooling2D()(x)
 x = Dropout(0.5)(x)
 out = Dense(5, activation="softmax")(x)
 

@@ -144,11 +144,12 @@ def indicizza_dataset_completo(percorso_base):
     print(f"Indicizzazione completata. Trovate {len(df)} immagini.")
     return df
 
+"""
 percorso = "C:\\Users\\Flavio\\Desktop\\datasetTotale" # Il tuo percorso
 df = indicizza_dataset_completo(percorso)
 
-# 2. Salva il CSV
 nome_file_csv = "dataset_immagini_completo.csv"
 df.to_csv(nome_file_csv, index=False)
 
 print(f"Dataset salvato correttamente in: {nome_file_csv}")
+"""
