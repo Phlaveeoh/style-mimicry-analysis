@@ -41,7 +41,7 @@ parser.add_argument(
     "-g", "--group",
     action='append',
     required=True,
-    help="Definisci un gruppo da plottare. Sintassi: 'EtichettaLegenda|colonna=valore,colonna2=valore'. "
+    help="Definisci un gruppo da plottare. Sintassi: 'Label|colonna=valore,colonna2=valore'. "
          "Esempio: 'Originali|tipo=Original,categoria=Training'"
 )
 
@@ -100,7 +100,7 @@ for group_def in args.group:
         val = val.strip()
 
         if col not in temp_df.columns:
-            print(f"  ATTENZIONE: La colonna '{col}' non esiste nel CSV. Filtro ignorato.")
+            print(f"La colonna '{col}' non esiste nel CSV. Filtro ignorato.")
             continue
         
         #Applica filtro al dataframe

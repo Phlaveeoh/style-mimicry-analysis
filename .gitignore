@@ -20,3 +20,9 @@ utils/__pycache__/
 
 #log
 *.log
+
+#Scripts di esecuzione
+*.bat
+*.sh
+!eseguiplot.bat
+!eseguiplot.sh

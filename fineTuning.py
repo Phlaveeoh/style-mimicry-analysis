@@ -1,10 +1,10 @@
 import pandas as pd
 import tensorflow as tf
 from keras.applications.convnext import ConvNeXtBase, preprocess_input
-from keras.layers import Dense, GlobalAveragePooling2D, Dropout, MaxAveragePooling2D
+from keras.layers import Dense, Dropout, GlobalAveragePooling2D, BatchNormalization
 from keras.models import Model
 from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
 from keras.losses import CategoricalCrossentropy
@@ -81,7 +81,9 @@ base = ConvNeXtBase(weights='imagenet', include_top=False, input_shape=(224, 224
 base.trainable = False
 
 x = base.output
-x = MaxAveragePooling2D()(x)
+x = GlobalAveragePooling2D()(x)
+x = BatchNormalization()(x)
+x = Dense(124, activation='relu')(x)
 x = Dropout(0.5)(x)
 out = Dense(5, activation="softmax")(x)
 
@@ -110,9 +112,9 @@ history1 = model.fit(
 # Fine tuning totale
 print("Fine Tuning del modello completo")
 
-#Scongelo solo gli ultimi 20 layer del modello base
+#Scongelo solo gli ultimi 30 layer del modello base
 base.trainable = True
-for layer in base.layers[:-20]:
+for layer in base.layers[:-30]:
     layer.trainable = False
 
 model.compile(
@@ -131,7 +133,7 @@ early_stop_fine = EarlyStopping(
 history_phase2 = model.fit(
     train_gen,
     validation_data=val_gen,
-    epochs=40,
+    epochs=50,
     callbacks=[early_stop_fine]
 )
 
