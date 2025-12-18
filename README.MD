@@ -1,5 +1,26 @@
 # Style Mimicry Analysis
 
+- [Style Mimicry Analysis](#style-mimicry-analysis)
+  - [Premessa](#premessa)
+  - [Metodologia alla base dello studio originale](#metodologia-alla-base-dello-studio-originale)
+  - [Analisi dello Spazio delle feature latenti Naive](#analisi-dello-spazio-delle-feature-latenti-naive)
+  - [Fine Tuning del modello](#fine-tuning-del-modello)
+    - [Data Augmentation](#data-augmentation)
+    - [Costruzione del Modello](#costruzione-del-modello)
+  - [Strategia di Training](#strategia-di-training)
+    - [Fase di riscaldamento](#fase-di-riscaldamento)
+    - [Fase di Fine-Tuning](#fase-di-fine-tuning)
+  - [Risultati](#risultati)
+    - [Immagini Originali](#immagini-originali)
+      - [Osservazioni:](#osservazioni)
+    - [Immagini Originali vs. Naive Mimicry Unprotected](#immagini-originali-vs-naive-mimicry-unprotected)
+      - [Osservazioni:](#osservazioni-1)
+    - [Immagini Originali vs. Naive Mimicry Unprotected vs. Naive Mimicry Protected](#immagini-originali-vs-naive-mimicry-unprotected-vs-naive-mimicry-protected)
+      - [Osservazioni:](#osservazioni-2)
+    - [Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry](#naive-mimicry-unprotected-vs-naive-mimicry-protected-vs-robust-mimicry)
+      - [Osservazioni:](#osservazioni-3)
+  - [Conclusioni e possibili sviluppi](#conclusioni-e-possibili-sviluppi)
+
 ## Premessa
 Il progetto nasce come approfondimento dello studio presentato in [“Robust Style Mimicry”](https://arxiv.org/abs/2406.12027), con l’obiettivo di valutare l’efficacia delle attuali tecniche di protezione delle immagini digitali. In particolare, si mira a dimostrare che le protezioni esistenti non garantiscono una sufficiente separazione nello spazio delle feature latenti tra immagini protette e corrispettive immagini originali, consentendo a un agente malintenzionato di replicare lo stile dell’immagine originale sfruttando le feature apprese dalle immagini nonostante la protezione.
 
