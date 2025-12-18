@@ -53,7 +53,7 @@ Data l'elevata dimensionalità di tali vettori, è stata successivamente applica
 
 L'analisi sperimentale condotta sui diversi blocchi delle reti ha permesso di isolare il punto ottimale per l'estrazione delle feature. È stato osservato che la massima separabilità spaziale tra gli embedding $E_a$ si ottiene in corrispondenza del layer Dense (o Fully Connected) immediatamente precedente allo strato di classificazione finale.
 
-Tale evidenza è confermata visivamente dal grafico t-SNE riportato di seguito - che confronta le immagini originali di 5 dei 10 artisti dello studio con la loro controparte protetta da mist: ![Plot](t-sne_plots\naive_plots\mist.png)
+Tale evidenza è confermata visivamente dal grafico t-SNE riportato di seguito - che confronta le immagini originali di 5 dei 10 artisti dello studio con la loro controparte protetta da mist: ![Plot](t-sne_plots/naive_plots/mist.png)
 A sinistra le feature estratte da un livello in mezzo alla rete, a destra quelle estratte dal livello Dense finale.  
 
 Come si può vedere dal plot, in questo stadio della rete l'informazione semantica raggiunge il massimo livello di astrazione. I cluster relativi ai diversi artisti appaiono ben definiti e distanziati, massimizzando la varianza tra le classi necessaria per il riconoscimento stilistico.
@@ -120,13 +120,13 @@ Una volta stabilizzata la testa, si è proceduto allo scongelamento degli ultimi
 Per validare l'ipotesi sono stati generati diversi plot t-SNE confrontando diversi sottoinsiemi del dataset. Ogni confronto risponde a una domanda specifica riguardo la robustezza delle protezioni e l'efficacia dell'attacco.
 
 ### Immagini Originali
-![t-SNE - Originali](resources\plots\tsne_originals.png)
+![t-SNE - Originali](resources/plots/tsne_originals.png)
 #### Osservazioni:
 - Si può notare la netta distinzione in cluster differenti per ogni artista; evidenziando così che il fine-tuning ha appreso le feature distintive dell'artista.  
   Lo stile di Alphonse Mucha risulta particolarmente distante dagli altri quattro artisti sia in questo plot che nei seguenti, suggerendo che il suo stile sia stato appreso particolarmente bene dal classificatore "esperto".
 
 ### Immagini Originali vs. Naive Mimicry Unprotected
-![t-SNE - Originali vs NM Unprotected](resources\plots\tsne_nm_unprotected-original.png)
+![t-SNE - Originali vs NM Unprotected](resources/plots/tsne_nm_unprotected-original.png)
 #### Osservazioni:
 - Da questo plot notiamo che le immagini originali sono ancora una volta raggruppate tra di loro (triangoli), mentre le immagini generate (cerchi) sono sparse nelle vicinanze dei cluster degli artisti.
 - Possiamo dedurre che il classificatore ha identificato effettivamente la differenza tra immagini generate ed originali, seppur riconoscendone lo stile.
@@ -136,7 +136,7 @@ Ora, introducendo all'equazione immagini protette, ci si aspetterebbe un allonta
 
 ### Immagini Originali vs. Naive Mimicry Unprotected vs. Naive Mimicry Protected
 Prendiamo come esempio le immagini protette da Glaze: (le altre protezioni agiscono in maniera analoga)
-![t-SNE - Originali vs NM Unprotected vs NM Glaze](resources\plots\tsne_nm_glaze-nm_unprotected-originals.png)
+![t-SNE - Originali vs NM Unprotected vs NM Glaze](resources/plots/tsne_nm_glaze-nm_unprotected-originals.png)
 #### Osservazioni:
 - Viene riconfermato anche qua il comportamento già evidenziato in precedenza: le immagini originali vengono raggruppate in cluster
 - Il dato cruciale emerge osservando la relazione tra i triangoli (non protetti) e i cerchi (protetti). Le due distribuzioni sono quasi indistinguibili. I cerchi non si allontanano dai triangoli, né migrano verso altri cluster stilistici. Al contrario, appaiono sovrapposti nella stessa regione dello spazio latente.
@@ -147,7 +147,7 @@ Se la protezione Glaze fosse efficace nel nascondere lo stile a questo livello d
 
 ### Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry 
 Quindi confronti0amo le immagini generate con il metodo Naive Mimicry con quelle generate con il metodo Robust Mimicry con Noisy Upscaling:
-![t-SNE - Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry](resources\plots\tsne_nm_glaze-nm_unprotected-rm_glaze_noisy_upscaling.png)
+![t-SNE - Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry](resources/plots/tsne_nm_glaze-nm_unprotected-rm_glaze_noisy_upscaling.png)
 #### Osservazioni:
 - Dato che la distribuzione delle immagini "Robust" (Quadrati) coincide con quella delle immagini "Naive" (Cerchi e Triangoli), possiamo affermare che l'attacco ha successo nell'annullare l'effetto di Glaze, permettendo al modello di apprendere le feature stilistiche corrette.
 - Eliminata la componente delle immagini originali (che introducevano una forte varianza nel raggruppamento dei campioni), la visualizzazione t-SNE mostra ora tanti piccoli cluster di 3 immagini.
