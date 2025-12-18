@@ -53,7 +53,7 @@ Data l'elevata dimensionalità di tali vettori, è stata successivamente applica
 
 L'analisi sperimentale condotta sui diversi blocchi delle reti ha permesso di isolare il punto ottimale per l'estrazione delle feature. È stato osservato che la massima separabilità spaziale tra gli embedding $E_a$ si ottiene in corrispondenza del layer Dense (o Fully Connected) immediatamente precedente allo strato di classificazione finale.
 
-Tale evidenza è confermata visivamente dal grafico t-SNE riportato di seguito - che confronta le immagini originali di 5 dei 10 artisti dello studio con la loro controparte protetta da mist: ![Plot](t-sne_plots/naive_plots/mist.png)
+Tale evidenza è confermata visivamente dal grafico t-SNE riportato di seguito - che confronta le immagini originali di 5 dei 10 artisti dello studio con la loro controparte protetta da mist: ![Plot](resources/plots/mist.png)
 A sinistra le feature estratte da un livello in mezzo alla rete, a destra quelle estratte dal livello Dense finale.  
 
 Come si può vedere dal plot, in questo stadio della rete l'informazione semantica raggiunge il massimo livello di astrazione. I cluster relativi ai diversi artisti appaiono ben definiti e distanziati, massimizzando la varianza tra le classi necessaria per il riconoscimento stilistico.
