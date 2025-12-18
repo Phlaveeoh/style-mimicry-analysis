@@ -3,9 +3,7 @@
 ## Premessa
 Il progetto nasce come approfondimento dello studio presentato in [“Robust Style Mimicry”](https://arxiv.org/abs/2406.12027), con l’obiettivo di valutare l’efficacia delle attuali tecniche di protezione delle immagini digitali. In particolare, si mira a dimostrare che le protezioni esistenti non garantiscono una sufficiente separazione nello spazio delle feature latenti tra immagini protette e corrispettive immagini originali, consentendo a un agente malintenzionato di replicare lo stile dell’immagine originale sfruttando le feature apprese dalle immagini nonostante la protezione.
 
-
 ## Metodologia alla base dello studio originale
-
 Nell'articolo originale per generare le immagini è stato impiegato uno script standard di HuggingFace per fare il fine tuning di Stable Diffusion 2.1 su 18 immagini di 10 artisti differenti.
 
 Per proteggere le immagini originali sono state usate 3 protezioni: 
@@ -17,9 +15,7 @@ Tutte le protezioni avevano gli iperparametri settati per massimizzare il livell
 
 Una volta generate le immagini da 10 prompt diversi, per valutare l'efficacia dell'imitazione dello stile ci si è affidati a valutazioni umane, in quanto le metriche automatizzate risultano inaffidabili. È stato quindi progettato uno studio utente volto a valutare la qualità dell'immagine e il trasferimento dello stile come attributi indipendenti delle generazioni.
 
-
 ## Analisi dello Spazio delle feature latenti Naive
-
 Il mio progetto punta perciò a provare a livello computazionale ciò che il paper ha provato a livello intuitivo.  
 
 L'ipotesi fondamentale alla base della ricerca è che l'efficacia delle tecniche di protezione avversaria (come Glaze, Mist o Anti-Dreambooth) debba necessariamente riflettersi in una alterazione misurabile della rappresentazione interna delle immagini. In altri termini, se una protezione è efficace, ci si aspetta che, proiettando le immagini in uno spazio latente (embedding space) sufficientemente profondo, le distribuzioni delle immagini protette divergano significativamente da quelle delle immagini originali, impedendo al modello di cogliere le feature stilistiche corrette.
@@ -44,7 +40,6 @@ Come si può vedere dal plot, in questo stadio della rete l'informazione semanti
 Ancora più interessante notare che le immagini con la protezione e le immagini senza la protezione nel plot T-SNE si sovrappongono. Questo è auspicabile ed avviene perchè il sistema di protezione deve poter mantenere le caratteristiche visive generali intatte visto che l'immagine deve sembrare il più possibile quella originale. È quindi corretto che le due rappresentazioni nello spazio delle features latenti calcolate dalle CNN standard siano il più coincidenti possibili.
 
 ## Fine Tuning del modello
-
 Per proseguire nello studio è stato quindi eseguito il fine tuning di uno dei modello scelti (ConvNext) atto al riconoscimento specifico dei 5 artisti.  
 Come nel paper originale, il set di immagini di addestramento comprendeva 18 immagini da 5 artisti differenti, per un totale di 90 immagini di training.
 
@@ -100,41 +95,47 @@ Una volta stabilizzata la testa, si è proceduto allo scongelamento degli ultimi
 - **Analisi dei risultati**:  
   L'addestramento si è interrotto automaticamente alla $6^a$ epoca su $50$ previste. Il modello ha raggiunto la convergenza e la funzione di Early Stopping ha fermato l'addestramento. Il modello ha raggiunto rapidamente una *Validation Accuracy* del $100\%$ e una *Validation Loss* minima di $0.63$. Sebbene il $100\%$ di accuratezza su un validation set ridotto (18 immagini) vada interpretato con cautela, la discesa coerente della loss conferma che il modello ha interiorizzato efficacemente le caratteristiche degli artisti senza degenerare in overfitting.
 
-## DA FARE ANALISI PLOT E PERCHé SONO STATI FATTI
-## dioc  
+## Risultati
+Per validare l'ipotesi sono stati generati diversi plot t-SNE confrontando diversi sottoinsiemi del dataset. Ogni confronto risponde a una domanda specifica riguardo la robustezza delle protezioni e l'efficacia dell'attacco.
 
-Nel dataset originale erano presenti 3 tipi principali di immagini generate:
-- Naive Mimicry da immagini non protette
-- Naive Mimicry da immagini protette
-- Robust Mimicry da immagini protette
+### Immagini Originali
+![t-SNE - Originali](resources\plots\tsne_originals.png)
+#### Osservazioni:
+- Si può notare la netta distinzione in cluster differenti per ogni artista; evidenziando così che il fine-tuning ha appreso le feature distintive dell'artista.  
+  Lo stile di Alphonse Mucha risulta particolarmente distante dagli altri quattro artisti sia in questo plot che nei seguenti, suggerendo che il suo stile sia stato appreso particolarmente bene dal classificatore "esperto".
 
-![Esempi di generazioni](generazioni.png)
+### Immagini Originali vs. Naive Mimicry Unprotected
+![t-SNE - Originali vs NM Unprotected](resources\plots\tsne_nm_unprotected-original.png)
+#### Osservazioni:
+- Da questo plot notiamo che le immagini originali sono ancora una volta raggruppate tra di loro (triangoli), mentre le immagini generate (cerchi) sono sparse nelle vicinanze dei cluster degli artisti.
+- Possiamo dedurre che il classificatore ha identificato effettivamente la differenza tra immagini generate ed originali, seppur riconoscendone lo stile.
+- Probabilmente le immagini generate presentano degli artefatti di generazione che il modello ha percepito come feature stilistiche, per questo la distanza dalle opere originali.
 
-## Risultati dei plot
-I plot sviluppati fin ora comprendono tutti e 5 gli artisti.
+Ora, introducendo all'equazione immagini protette, ci si aspetterebbe un allontanamento dal cluster dell'artista, a riprova che la protezione ha funzionato.
 
-### Originali vs Naive Mimicry unprotected
-![Originali vs Naive Mimicry unprotected](t-sne_plots\dynamic_plots\tsne_nm_unprotected-original.png)
+### Immagini Originali vs. Naive Mimicry Unprotected vs. Naive Mimicry Protected
+Prendiamo come esempio le immagini protette da Glaze: (le altre protezioni agiscono in maniera analoga)
+![t-SNE - Originali vs NM Unprotected vs NM Glaze](resources\plots\tsne_nm_glaze-nm_unprotected-originals.png)
+#### Osservazioni:
+- Viene riconfermato anche qua il comportamento già evidenziato in precedenza: le immagini originali vengono raggruppate in cluster
+- Il dato cruciale emerge osservando la relazione tra i triangoli (non protetti) e i cerchi (protetti). Le due distribuzioni sono quasi indistinguibili. I cerchi non si allontanano dai triangoli, né migrano verso altri cluster stilistici. Al contrario, appaiono sovrapposti nella stessa regione dello spazio latente.
 
-### Originali vs Naive Mimicry unprotected vs Naive Mimicry Protected
-#### glaze
-![](t-sne_plots\dynamic_plots\tsne_nm_glaze-nm_unprotected-originals.png)
-#### antidb
-![](t-sne_plots\dynamic_plots\tsne_nm_antidb-nm_unprotected-originals.png)
-#### mist
-![](t-sne_plots\dynamic_plots\tsne_nm_mist-nm_unprotected-originals.png)
+Se la protezione Glaze fosse efficace nel nascondere lo stile a questo livello di astrazione, ci aspetteremmo che i cerchi (Protected) si posizionassero distanti dai triangoli (Unprotected), simulando uno stile differente o posizionandosi in una zona diversa. La sovrapposizione osservata dimostra invece che:
+1. Le perturbazioni introdotte da glaze, sebbene visibili a occhio nudo, riescono ad ingannare i modelli generativi standard, non riescono ad alterare significativamente le feature estratte dal modello addestrato.
+2. Il modello considera l'immagine protetta esattamente come quella non protetta.
 
-### Naive Mimicry unprotected vs Robust Mimicry
-#### glaze
-![](t-sne_plots\dynamic_plots\tsne_nm_unprotected-rm_glaze.png)
-#### antidb
-![]()
-#### mist
-![]()
+### Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry 
+Quindi confronti0amo le immagini generate con il metodo Naive Mimicry con quelle generate con il metodo Robust Mimicry con Noisy Upscaling:
+![t-SNE - Naive Mimicry Unprotected vs Naive Mimicry Protected vs Robust Mimicry](resources\plots\tsne_nm_glaze-nm_unprotected-rm_glaze_noisy_upscaling.png)
+#### Osservazioni:
+- Dato che la distribuzione delle immagini "Robust" (Quadrati) coincide con quella delle immagini "Naive" (Cerchi e Triangoli), possiamo affermare che l'attacco ha successo nell'annullare l'effetto di Glaze, permettendo al modello di apprendere le feature stilistiche corrette.
+- Eliminata la componente delle immagini originali (che introducevano una forte varianza nel raggruppamento dei campioni), la visualizzazione t-SNE mostra ora tanti piccoli cluster di 3 immagini.
 
-### Naive Mimicry unprotected vs Naive Mimcry protected
+## Conclusioni e possibili sviluppi
+L'analisi t-SNE condotta attraverso il modello ConvNeXt addestrato ha permesso di quantificare ciò che lo studio utente aveva suggerito qualitativamente: le protezioni avversarie attuali, pur introducendo rumore visibile, non riescono a spostare le immagini in regioni dello spazio latente sufficientemente distanti dallo stile originale.  
+Quindi l'attacco Robust Mimicry, con dei semplici metodi di preprocessing, riesce a generare imitazioni che, nello spazio delle feature profonde, sono virtualmente identiche alle generazioni ottenute da opere non protette."
 
-Da questi plot è molto interessante vedere che i Mucha originali sono sempre molto distanti da ogni altra immagine, probabilmente la CNN riconosce molto bene lo stile di Mucha.  
-
-- Le immagini originali sono più o meno sempre raccolte in cluster accurati e definiti
-- Le immagini generate con Naive Mimicry da arte NON protetta e quelle generate con il Robust Mimicry sono molto simili tra di loro, quasi sovrapposte, a dimostrazione che il metodo rompe la protezione
+Comunque, questo studio è ancora lontano dall'essere ideale. 
+I prossimi passi saranno perciò volti a:
+- Ripetere i plot con altri modelli "backbone + finetuning" per dimostrare l'indipendenza dei risultati dal modello.
+- Calcolare metriche adeguate ed inconfutabili per misurare la distanza delle feature nello spazio bidimensionale calcolato da t-SNE.
