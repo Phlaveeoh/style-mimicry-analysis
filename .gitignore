@@ -12,8 +12,9 @@ utils/__pycache__/
 #Modelli
 *.keras
 
-#grafici t-SNE
+#Plots
 /t-sne_plots/
+/classification_plots/
 
 #File CSV generati
 *.csv
