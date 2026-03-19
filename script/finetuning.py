@@ -10,6 +10,8 @@ from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping
 from keras.losses import CategoricalCrossentropy
 from utils.indicizzaDataset import indicizza_dataset_completo
+import matplotlib.pyplot as plt
+import visualkeras
 
 percorsoDataset = "C:\\Users\\Flavio\\Desktop\\datasetTotale"
 df = indicizza_dataset_completo(percorsoDataset)
@@ -83,6 +85,9 @@ out = Dense(5, activation="softmax")(x)
 
 model = Model(inputs=base.input, outputs=out)
 
+visualkeras.layered_view(model, legend_text_spacing_offset=0).show() # display using your system viewer
+visualkeras.layered_view(model, legend_text_spacing_offset=0, to_file='ConvNext_Finetuned_V3.png') # write to disk
+
 loss_function = CategoricalCrossentropy(label_smoothing=0.1)
 
 model.compile(
@@ -98,12 +103,37 @@ early_stop = EarlyStopping(
     restore_best_weights=True
 )
 
-model.fit(
+history = model.fit(
     train_gen,
     validation_data=val_gen,
     epochs=50,
     callbacks=[early_stop]
 )
+
+# Design a subplot grid 1x2
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+
+# Plot for accuracy and val_accuracy
+plt.plot(history.history['accuracy'], label='accuracy')
+plt.plot(history.history['val_accuracy'], label='val_accuracy')
+plt.xlabel('Epoch', fontsize=13)
+plt.ylabel('Accuracy', fontsize=13)
+plt.ylim([0.0, 1])
+plt.legend(loc='lower right')
+
+plt.subplot(1, 2, 2)
+
+# Plot for loss and val_loss
+plt.plot(history.history['loss'], label='loss')
+plt.plot(history.history['val_loss'], label='val_loss')
+plt.xlabel('Epoch', fontsize=13)
+plt.ylabel('Loss', fontsize=13)
+plt.ylim([0.0, 2])
+plt.legend(loc='upper right')
+
+plt.tight_layout()
+plt.show()
 
 nome_file = f"{model.name}finetuned.keras"
 model.save(nome_file)
